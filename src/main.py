@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from src.api.services import router as services_router
+
 
 class HealthResponse(BaseModel):
     status: str
@@ -17,6 +19,9 @@ app = FastAPI(
     description="AI-powered intelligent log sampling",
     version="0.1.0",
 )
+
+# Include routers
+app.include_router(services_router)
 
 
 @app.get("/health", response_model=HealthResponse)
