@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from src.api.patterns import router as patterns_router
+from src.api.policies import router as policies_router
 from src.api.services import router as services_router
 
 
@@ -22,6 +24,8 @@ app = FastAPI(
 
 # Include routers
 app.include_router(services_router)
+app.include_router(policies_router)
+app.include_router(patterns_router)
 
 
 @app.get("/health", response_model=HealthResponse)

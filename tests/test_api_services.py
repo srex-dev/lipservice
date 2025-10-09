@@ -111,4 +111,3 @@ def test_create_service_with_different_teams(team_id, service_name):
     data = response.json()
     assert data["team_id"] == team_id
     assert data["name"] == service_name
-
