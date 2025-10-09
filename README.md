@@ -1,8 +1,8 @@
-# 🤖 AI Logging Intelligence
+# 🎙️ LipService
 
 > **Intelligent, AI-powered log sampling that reduces costs by 50-80% while maintaining full observability**
 
-[![Status](https://img.shields.io/badge/status-in%20development-yellow)](https://github.com/yourusername/ai-logging-intelligence)
+[![Status](https://img.shields.io/badge/status-in%20development-yellow)](https://github.com/yourusername/lipservice)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11+-blue)](https://www.python.org/downloads/)
 
@@ -10,7 +10,7 @@
 
 ## 🌟 What is This?
 
-AI Logging Intelligence is a next-generation logging system that uses Large Language Models (LLMs) to:
+LipService is a next-generation logging system that uses Large Language Models (LLMs) to:
 
 - **Automatically optimize log sampling** based on patterns and context
 - **Detect anomalies** and explain them in plain language
@@ -115,8 +115,8 @@ logger.error("payment_failed", amount=99.99)  # Always kept
 ### Service (Backend)
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ai-logging-intelligence
-cd ai-logging-intelligence
+git clone https://github.com/yourusername/lipservice
+cd lipservice
 
 # Start with Docker Compose
 docker-compose up -d

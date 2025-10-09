@@ -7,7 +7,7 @@
 
 ### Step 1: Review the Repository
 ```bash
-cd C:\Users\jonat\ai-logging-intelligence
+cd C:\Users\jonat\lipservice
 dir  # See what's here
 ```
 
@@ -42,7 +42,7 @@ Create your first file: `src\main.py`
 ```python
 from fastapi import FastAPI
 
-app = FastAPI(title="AI Logging Intelligence")
+app = FastAPI(title="LipService")
 
 @app.get("/health")
 async def health():
@@ -51,7 +51,7 @@ async def health():
 @app.get("/")
 async def root():
     return {
-        "name": "AI Logging Intelligence",
+        "name": "LipService",
         "version": "0.1.0",
         "status": "in development"
     }

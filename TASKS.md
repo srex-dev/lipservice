@@ -1,4 +1,4 @@
-# Current Tasks - Sprint 1
+# Current Tasks - Sprint 1 (LipService)
 
 **Sprint:** 1 (Project Setup)  
 **Dates:** Week 1-2  

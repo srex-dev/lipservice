@@ -1,4 +1,4 @@
-# Sprint Plan - AI Logging Intelligence
+# Sprint Plan - LipService
 
 ## Overview
 
