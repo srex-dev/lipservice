@@ -13,7 +13,7 @@ from src.storage.models import Base
 config = context.config
 
 # Override sqlalchemy.url with environment variable if present
-database_url = os.getenv("DATABASE_URL", "postgresql://lipservice:lipservice@localhost:5432/lipservice")
+database_url = os.getenv("DATABASE_URL", "postgresql://lipservice:lipservice@localhost:5433/lipservice")
 config.set_main_option("sqlalchemy.url", database_url)
 
 # Interpret the config file for Python logging.

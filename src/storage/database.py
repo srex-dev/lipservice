@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from src.storage.models import Base
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://lipservice:lipservice@localhost:5432/lipservice")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://lipservice:lipservice@localhost:5433/lipservice")
 
 engine = create_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
