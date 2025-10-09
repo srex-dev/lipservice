@@ -34,4 +34,3 @@ def test_root_endpoint_returns_service_info():
 def test_endpoint_status_codes(endpoint: str, expected_status: int):
     response = client.get(endpoint)
     assert response.status_code == expected_status
-
