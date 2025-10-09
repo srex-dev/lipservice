@@ -7,20 +7,32 @@ readme = "README.md"
 license = { text = "MIT" }
 
 dependencies = [
+    # Core API framework
     "fastapi>=0.118.0",
     "uvicorn>=0.37.0",
-    "sqlalchemy>=2.0.0",
-    "psycopg2-binary>=2.9.0",
-    "redis>=6.4.0",
     "python-dotenv>=1.0.0",
-    "pydantic>=2.10.0",
-    "structlog>=24.0.0",
-    "openai>=1.0.0",
-    "anthropic>=0.50.0",
-    "scikit-learn>=1.3.0",
-    "numpy>=1.24.0",
-    "clickhouse-driver>=0.2.6",
     "httpx>=0.27.0",
+    
+    # Database & Storage (matching PostHog versions)
+    "sqlalchemy==2.0.38",  # PostHog uses 2.0.38
+    "psycopg2-binary==2.9.7",  # PostHog uses 2.9.7
+    "redis==4.5.4",  # PostHog uses 4.5.4 (not 6.x!)
+    "clickhouse-driver==0.2.9",  # PostHog uses 0.2.9
+    
+    # Pydantic & Logging (matching PostHog)
+    "pydantic==2.10.3",  # PostHog uses 2.10.3
+    "structlog==25.4.0",  # PostHog uses 25.4.0
+    
+    # LLM Providers (matching PostHog)
+    "openai==1.102.0",  # PostHog uses 1.102.0
+    "anthropic==0.52.0",  # PostHog uses 0.52.0
+    
+    # ML/Analysis (matching PostHog)
+    "scikit-learn==1.5.0",  # PostHog uses 1.5.0
+    "numpy==1.26.4",  # PostHog uses 1.26.4
+    
+    # Additional (not in PostHog, but needed for us)
+    "alembic>=1.13.0",  # Database migrations
 ]
 
 [project.optional-dependencies]
