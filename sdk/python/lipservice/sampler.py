@@ -11,6 +11,7 @@ import structlog
 from lipservice.client import LipServiceClient
 from lipservice.models import PatternStats, SamplingPolicy
 from lipservice.signature import compute_signature
+from lipservice.performance import get_signature_computer
 
 logger = structlog.get_logger(__name__)
 
@@ -50,6 +51,9 @@ class AdaptiveSampler:
         self.policy_refresh_interval = policy_refresh_interval
         self.pattern_report_interval = pattern_report_interval
         self.max_pattern_cache_size = max_pattern_cache_size
+        
+        # Performance optimizations
+        self.signature_computer = get_signature_computer()
 
         self.policy: SamplingPolicy | None = None
         self.pattern_stats: dict[str, dict[str, Any]] = defaultdict(self._default_pattern_stats)
@@ -128,12 +132,12 @@ class AdaptiveSampler:
 
         # Always sample errors and critical logs
         if severity_upper in self.ALWAYS_SAMPLE_SEVERITIES:
-            signature = compute_signature(message)
+            signature = self.signature_computer.compute_signature(message)
             self._track_pattern(signature, message, severity_upper)
             return True, signature
 
         # Compute pattern signature
-        signature = compute_signature(message)
+        signature = self.signature_computer.compute_signature(message)
 
         # Track pattern statistics
         self._track_pattern(signature, message, severity_upper)
