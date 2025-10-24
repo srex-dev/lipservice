@@ -8,6 +8,8 @@ from src.api.policies import router as policies_router
 from src.api.services import router as services_router
 from src.api.intelligent_analysis import router as intelligent_analysis_router
 from src.api.adaptive_filtering import router as adaptive_filtering_router
+from src.api.realtime_streaming import router as realtime_streaming_router
+from src.api.visualization import router as visualization_router
 
 
 class HealthResponse(BaseModel):
@@ -22,8 +24,8 @@ class RootResponse(BaseModel):
 
 app = FastAPI(
     title="LipService",
-    description="AI-powered intelligent log sampling with semantic analysis and adaptive filtering",
-    version="0.2.0",
+    description="AI-powered intelligent log sampling with real-time streaming and advanced visualization",
+    version="0.3.0",
 )
 
 # Include routers
@@ -34,6 +36,8 @@ app.include_router(analysis_router)
 app.include_router(pipeline_router)
 app.include_router(intelligent_analysis_router)
 app.include_router(adaptive_filtering_router)
+app.include_router(realtime_streaming_router)
+app.include_router(visualization_router)
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -45,8 +49,8 @@ async def health() -> HealthResponse:
 async def root() -> RootResponse:
     return RootResponse(
         name="LipService",
-        version="0.2.0",
-        status="production ready",
+        version="0.3.0",
+        status="production ready with real-time streaming",
     )
 
 
