@@ -1,7 +1,7 @@
 """FastAPI integration for LipService SDK."""
 
 import uuid
-from typing import Callable
+from collections.abc import Callable
 
 try:
     from fastapi import Request, Response

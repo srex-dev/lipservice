@@ -56,7 +56,7 @@ def configure_adaptive_logging(
         ...     service_name="my-api",
         ...     lipservice_url="https://lipservice.company.com"
         ... )
-        
+
         >>> # With PostHog integration
         >>> configure_adaptive_logging(
         ...     service_name="my-api",
@@ -112,19 +112,19 @@ def configure_adaptive_logging(
     posthog_handler = None
     if posthog_api_key and posthog_team_id:
         from lipservice.posthog import create_posthog_handler
-        
+
         posthog_handler = create_posthog_handler(
             api_key=posthog_api_key,
             team_id=posthog_team_id,
             endpoint=posthog_endpoint,
         )
-        logger.info("posthog_handler_created", team_id=posthog_team_id, endpoint=posthog_endpoint)
+        # logger.info("posthog_handler_created", team_id=posthog_team_id, endpoint=posthog_endpoint)
 
     # Configure standard logging
     if downstream_handler or posthog_handler or not use_structlog:
         # Use PostHog handler as downstream if available, otherwise use provided handler
         final_downstream_handler = posthog_handler or downstream_handler
-        
+
         handler = LipServiceHandler(
             sampler=_sampler,
             downstream_handler=final_downstream_handler,

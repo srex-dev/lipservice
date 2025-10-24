@@ -1,6 +1,5 @@
 """LipService API client for fetching policies and reporting patterns."""
 
-import asyncio
 from datetime import datetime
 from typing import Any
 

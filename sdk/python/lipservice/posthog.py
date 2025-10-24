@@ -6,18 +6,16 @@ using the OpenTelemetry Protocol (OTLP).
 """
 
 import asyncio
-import json
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import httpx
 import structlog
 from opentelemetry.proto.collector.logs.v1.logs_service_pb2 import ExportLogsServiceRequest
-from opentelemetry.proto.common.v1.common_pb2 import AnyValue, KeyValue
+from opentelemetry.proto.common.v1.common_pb2 import AnyValue, InstrumentationScope, KeyValue
 from opentelemetry.proto.logs.v1.logs_pb2 import LogRecord, ResourceLogs, ScopeLogs
 from opentelemetry.proto.resource.v1.resource_pb2 import Resource
-from opentelemetry.proto.common.v1.common_pb2 import InstrumentationScope
 
 from lipservice.models import LogContext
 
@@ -60,7 +58,7 @@ class PostHogConfig:
         # OTLP endpoint
         self.otlp_endpoint = f"{self.endpoint}/api/v1/otlp/v1/logs"
 
-    def get_headers(self) -> Dict[str, str]:
+    def get_headers(self) -> dict[str, str]:
         """Get HTTP headers for PostHog requests."""
         return {
             "Content-Type": "application/x-protobuf",
@@ -89,9 +87,9 @@ class PostHogOTLPExporter:
             headers=config.get_headers(),
             timeout=config.timeout,
         )
-        self.batch: List[LogRecord] = []
+        self.batch: list[LogRecord] = []
         self._running = False
-        self._flush_task: Optional[asyncio.Task] = None
+        self._flush_task: asyncio.Task | None = None
 
     async def start(self) -> None:
         """Start the exporter background tasks."""
@@ -129,7 +127,7 @@ class PostHogOTLPExporter:
         message: str,
         severity: str,
         timestamp: datetime,
-        context: Optional[LogContext] = None,
+        context: LogContext | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -157,7 +155,7 @@ class PostHogOTLPExporter:
         message: str,
         severity: str,
         timestamp: datetime,
-        context: Optional[LogContext] = None,
+        context: LogContext | None = None,
         **kwargs: Any,
     ) -> LogRecord:
         """Create an OTLP LogRecord."""

@@ -1,7 +1,8 @@
 """Tests for adaptive sampler."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 
 from lipservice.client import LipServiceClient
 from lipservice.models import SamplingPolicy

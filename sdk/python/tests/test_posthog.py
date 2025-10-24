@@ -3,7 +3,6 @@ Tests for PostHog OTLP integration.
 """
 
 import asyncio
-import json
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -102,7 +101,7 @@ class TestPostHogOTLPExporter:
     def test_create_log_record(self, exporter):
         """Test log record creation."""
         timestamp = datetime(2024, 1, 1, 12, 0, 0)
-        
+
         log_record = exporter._create_log_record(
             message="Test message",
             severity="INFO",
@@ -115,7 +114,7 @@ class TestPostHogOTLPExporter:
         assert log_record.severity_text == "INFO"
         assert log_record.severity_number == 9
         assert log_record.body.string_value == "Test message"
-        
+
         # Check attributes
         attributes = {attr.key: attr.value for attr in log_record.attributes}
         assert attributes["severity_text"].string_value == "INFO"
@@ -126,7 +125,7 @@ class TestPostHogOTLPExporter:
     def test_create_log_record_with_context(self, exporter):
         """Test log record creation with context."""
         from lipservice.models import LogContext
-        
+
         timestamp = datetime(2024, 1, 1, 12, 0, 0)
         context = LogContext(
             user_id="123",
@@ -135,7 +134,7 @@ class TestPostHogOTLPExporter:
             span_id="span-101",
             custom_fields={"environment": "test"},
         )
-        
+
         log_record = exporter._create_log_record(
             message="Test message",
             severity="ERROR",
@@ -155,12 +154,12 @@ class TestPostHogOTLPExporter:
         """Test exporter start and stop."""
         # Mock the client
         exporter.client = AsyncMock()
-        
+
         # Start exporter
         await exporter.start()
         assert exporter._running
         assert exporter._flush_task is not None
-        
+
         # Stop exporter
         await exporter.stop()
         assert not exporter._running
@@ -171,10 +170,10 @@ class TestPostHogOTLPExporter:
         """Test log export."""
         # Mock the client
         exporter.client = AsyncMock()
-        
+
         # Start exporter
         await exporter.start()
-        
+
         # Export a log
         timestamp = datetime.now()
         await exporter.export_log(
@@ -182,12 +181,12 @@ class TestPostHogOTLPExporter:
             severity="INFO",
             timestamp=timestamp,
         )
-        
+
         # Check batch
         assert len(exporter.batch) == 1
         assert exporter.batch[0].body.string_value == "Test message"
         assert exporter.batch[0].severity_text == "INFO"
-        
+
         await exporter.stop()
 
     @pytest.mark.asyncio
@@ -196,32 +195,32 @@ class TestPostHogOTLPExporter:
         # Mock successful response
         mock_response = MagicMock()
         mock_response.raise_for_status.return_value = None
-        
+
         exporter.client = AsyncMock()
         exporter.client.post.return_value = mock_response
-        
+
         # Start exporter
         await exporter.start()
-        
+
         # Add logs to batch
         timestamp = datetime.now()
         await exporter.export_log("Message 1", "INFO", timestamp)
         await exporter.export_log("Message 2", "WARNING", timestamp)
-        
+
         # Batch should be full (size=2)
         assert len(exporter.batch) == 2
-        
+
         # Manually flush
         await exporter._flush_batch()
-        
+
         # Batch should be empty
         assert len(exporter.batch) == 0
-        
+
         # Check that POST was called
         exporter.client.post.assert_called_once()
         call_args = exporter.client.post.call_args
         assert call_args[0][0] == exporter.config.otlp_endpoint
-        
+
         await exporter.stop()
 
     @pytest.mark.asyncio
@@ -230,29 +229,29 @@ class TestPostHogOTLPExporter:
         # Mock retryable error then success
         mock_error_response = MagicMock()
         mock_error_response.status_code = 429  # Rate limited
-        
+
         mock_success_response = MagicMock()
         mock_success_response.raise_for_status.return_value = None
-        
+
         exporter.client = AsyncMock()
         exporter.client.post.side_effect = [
             httpx.HTTPStatusError("Rate limited", request=MagicMock(), response=mock_error_response),
             mock_success_response,
         ]
-        
+
         # Start exporter
         await exporter.start()
-        
+
         # Add log to batch
         timestamp = datetime.now()
         await exporter.export_log("Test message", "INFO", timestamp)
-        
+
         # Flush with retries
         await exporter._flush_batch()
-        
+
         # Should have retried once
         assert exporter.client.post.call_count == 2
-        
+
         await exporter.stop()
 
     @pytest.mark.asyncio
@@ -261,27 +260,27 @@ class TestPostHogOTLPExporter:
         # Mock persistent error
         mock_error_response = MagicMock()
         mock_error_response.status_code = 429  # Rate limited
-        
+
         exporter.client = AsyncMock()
         exporter.client.post.side_effect = httpx.HTTPStatusError(
-            "Rate limited", 
-            request=MagicMock(), 
+            "Rate limited",
+            request=MagicMock(),
             response=mock_error_response
         )
-        
+
         # Start exporter
         await exporter.start()
-        
+
         # Add log to batch
         timestamp = datetime.now()
         await exporter.export_log("Test message", "INFO", timestamp)
-        
+
         # Flush with retries
         await exporter._flush_batch()
-        
+
         # Should have retried max times
         assert exporter.client.post.call_count == exporter.config.max_retries + 1
-        
+
         await exporter.stop()
 
 
@@ -316,19 +315,19 @@ class TestPostHogHandler:
         record.module = "test_module"
         record.funcName = "test_function"
         record.lineno = 42
-        
+
         # Mock the exporter
         handler.exporter.export_log = AsyncMock()
-        
+
         # Emit the record
         handler.emit(record)
-        
+
         # Check that exporter.export_log was called
         mock_create_task.assert_called_once()
-        
+
         # Get the coroutine that was passed to create_task
         coroutine = mock_create_task.call_args[0][0]
-        
+
         # Check the coroutine arguments
         assert coroutine.cr_frame.f_locals['message'] == "Test message"
         assert coroutine.cr_frame.f_locals['severity'] == "INFO"
@@ -348,19 +347,19 @@ class TestPostHogHandler:
         record.lineno = 42
         record.lipservice_signature = "test_signature"
         record.lipservice_sampled = True
-        
+
         # Mock the exporter
         handler.exporter.export_log = AsyncMock()
-        
+
         # Emit the record
         handler.emit(record)
-        
+
         # Check that exporter.export_log was called
         mock_create_task.assert_called_once()
-        
+
         # Get the coroutine that was passed to create_task
         coroutine = mock_create_task.call_args[0][0]
-        
+
         # Check the coroutine arguments
         attributes = coroutine.cr_frame.f_locals['attributes']
         assert attributes['lipservice_signature'] == "test_signature"
@@ -370,10 +369,10 @@ class TestPostHogHandler:
     def test_close_handler(self, mock_run, handler):
         """Test closing handler."""
         handler._started = True
-        
+
         # Close handler
         handler.close()
-        
+
         # Check that exporter.stop was called
         mock_run.assert_called_once()
 
@@ -390,7 +389,7 @@ class TestCreatePostHogHandler:
             timeout=15.0,
             batch_size=50,
         )
-        
+
         assert isinstance(handler, PostHogHandler)
         assert handler.config.api_key == "phc_test"
         assert handler.config.team_id == "12345"
@@ -404,7 +403,7 @@ class TestCreatePostHogHandler:
             api_key="phc_test",
             team_id="12345",
         )
-        
+
         assert isinstance(handler, PostHogHandler)
         assert handler.config.api_key == "phc_test"
         assert handler.config.team_id == "12345"
@@ -420,29 +419,29 @@ class TestOTLPRequestCreation:
         """Test OTLP request creation."""
         config = PostHogConfig(api_key="phc_test", team_id="12345")
         exporter = PostHogOTLPExporter(config)
-        
+
         # Add some log records to batch
         timestamp = datetime.now()
         exporter.batch.append(exporter._create_log_record("Message 1", "INFO", timestamp))
         exporter.batch.append(exporter._create_log_record("Message 2", "ERROR", timestamp))
-        
+
         # Create OTLP request
         request = exporter._create_otlp_request()
-        
+
         assert isinstance(request, ExportLogsServiceRequest)
         assert len(request.resource_logs) == 1
-        
+
         resource_logs = request.resource_logs[0]
         assert len(resource_logs.scope_logs) == 1
-        
+
         scope_logs = resource_logs.scope_logs[0]
         assert len(scope_logs.log_records) == 2
-        
+
         # Check resource attributes
         resource_attrs = {attr.key: attr.value for attr in resource_logs.resource.attributes}
         assert resource_attrs["service.name"].string_value == "lipservice-sdk"
         assert resource_attrs["service.version"].string_value == "0.2.0"
-        
+
         # Check scope attributes
         scope = resource_logs.scope_logs[0].scope
         assert scope.name == "lipservice"
@@ -458,28 +457,28 @@ async def test_integration_example():
         team_id="12345",
         batch_size=1,  # Small batch for testing
     )
-    
+
     exporter = PostHogOTLPExporter(config)
-    
+
     # Mock successful HTTP response
     mock_response = MagicMock()
     mock_response.raise_for_status.return_value = None
     exporter.client = AsyncMock()
     exporter.client.post.return_value = mock_response
-    
+
     # Start exporter
     await exporter.start()
-    
+
     # Export logs
     timestamp = datetime.now()
     await exporter.export_log("User login", "INFO", timestamp, user_id="123")
     await exporter.export_log("Payment failed", "ERROR", timestamp, user_id="123", amount=99.99)
-    
+
     # Wait for flush
     await asyncio.sleep(0.2)
-    
+
     # Stop exporter
     await exporter.stop()
-    
+
     # Verify logs were sent
     assert exporter.client.post.call_count >= 1

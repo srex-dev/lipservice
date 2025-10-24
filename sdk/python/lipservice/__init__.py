@@ -12,7 +12,7 @@ Example:
 """
 
 from lipservice.client import LipServiceClient
-from lipservice.config import configure_adaptive_logging, get_logger
+from lipservice.config import configure_adaptive_logging, get_logger, shutdown
 from lipservice.handler import LipServiceHandler
 from lipservice.posthog import PostHogConfig, PostHogHandler, PostHogOTLPExporter, create_posthog_handler
 from lipservice.sampler import AdaptiveSampler
@@ -22,11 +22,12 @@ __version__ = "0.2.0"
 __all__ = [
     "configure_adaptive_logging",
     "get_logger",
+    "shutdown",
     "LipServiceClient",
     "LipServiceHandler",
     "AdaptiveSampler",
     "PostHogConfig",
-    "PostHogHandler", 
+    "PostHogHandler",
     "PostHogOTLPExporter",
     "create_posthog_handler",
 ]
