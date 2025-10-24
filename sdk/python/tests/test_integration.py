@@ -52,7 +52,7 @@ class TestSDKIntegration:
         """Test complete SDK workflow from configuration to logging"""
 
         # Configure SDK
-        await configure_adaptive_logging(
+        configure_adaptive_logging(
             service_name='integration-test',
             lipservice_url='http://localhost:8000',
             posthog_api_key='phc_test_key',
@@ -65,10 +65,10 @@ class TestSDKIntegration:
         logger = get_logger('integration-test')
 
         # Test different log levels
-        await logger.info('User logged in', {'user_id': 123})
-        await logger.warn('High memory usage', {'usage': 85})
-        await logger.error('Database connection failed', {'error': 'timeout'})
-        await logger.debug('Cache hit', {'key': 'user:123'})
+        logger.info('User logged in', user_id=123)
+        logger.warning('High memory usage', usage=85)
+        logger.error('Database connection failed', error='timeout')
+        logger.debug('Cache hit', key='user:123')
 
         # Wait for background tasks
         await asyncio.sleep(0.1)
@@ -88,7 +88,7 @@ class TestSDKIntegration:
         """Test SDK functionality without PostHog integration"""
 
         # Configure SDK without PostHog
-        await configure_adaptive_logging(
+        configure_adaptive_logging(
             service_name='no-posthog-test',
             lipservice_url='http://localhost:8000',
             policy_refresh_interval=1,
@@ -98,8 +98,8 @@ class TestSDKIntegration:
         logger = get_logger('no-posthog-test')
 
         # Test logging
-        await logger.info('Test message', {'test': 'value'})
-        await logger.error('Test error', {'error': 'test'})
+        logger.info('Test message', test='value')
+        logger.error('Test error', error='test')
 
         # Wait for background tasks
         await asyncio.sleep(0.1)
@@ -119,7 +119,7 @@ class TestSDKIntegration:
         mock_lipservice_backend.reportPatterns.side_effect = Exception('Report error')
 
         # Configure SDK
-        await configure_adaptive_logging(
+        configure_adaptive_logging(
             service_name='error-test',
             lipservice_url='http://localhost:8000',
             policy_refresh_interval=1,
@@ -129,8 +129,8 @@ class TestSDKIntegration:
         logger = get_logger('error-test')
 
         # Test logging (should work even with backend errors)
-        await logger.info('Test message', {'test': 'value'})
-        await logger.error('Test error', {'error': 'test'})
+        logger.info('Test message', test='value')
+        logger.error('Test error', error='test')
 
         # Wait for background tasks
         await asyncio.sleep(0.1)
@@ -146,7 +146,7 @@ class TestSDKIntegration:
         """Test concurrent logging from multiple threads"""
 
         # Configure SDK
-        await configure_adaptive_logging(
+        configure_adaptive_logging(
             service_name='concurrent-test',
             lipservice_url='http://localhost:8000',
             policy_refresh_interval=1,
@@ -179,7 +179,7 @@ class TestSDKIntegration:
         """Test SDK shutdown and cleanup"""
 
         # Configure SDK
-        await configure_adaptive_logging(
+        configure_adaptive_logging(
             service_name='shutdown-test',
             lipservice_url='http://localhost:8000',
             policy_refresh_interval=1,
@@ -209,7 +209,7 @@ class TestPerformanceIntegration:
         """Test high volume logging performance"""
 
         # Configure SDK
-        await configure_adaptive_logging(
+        configure_adaptive_logging(
             service_name='performance-test',
             lipservice_url='http://localhost:8000',
             policy_refresh_interval=10,
@@ -247,7 +247,7 @@ class TestPerformanceIntegration:
         initial_memory = process.memory_info().rss
 
         # Configure SDK
-        await configure_adaptive_logging(
+        configure_adaptive_logging(
             service_name='memory-test',
             lipservice_url='http://localhost:8000',
             policy_refresh_interval=10,
@@ -278,7 +278,7 @@ class TestEdgeCases:
     async def test_empty_messages(self, mock_lipservice_backend):
         """Test handling of empty messages"""
 
-        await configure_adaptive_logging(
+        configure_adaptive_logging(
             service_name='edge-test',
             lipservice_url='http://localhost:8000',
         )
@@ -302,7 +302,7 @@ class TestEdgeCases:
     async def test_special_characters(self, mock_lipservice_backend):
         """Test handling of special characters in messages"""
 
-        await configure_adaptive_logging(
+        configure_adaptive_logging(
             service_name='special-test',
             lipservice_url='http://localhost:8000',
         )
@@ -330,7 +330,7 @@ class TestEdgeCases:
     async def test_large_attributes(self, mock_lipservice_backend):
         """Test handling of large attribute dictionaries"""
 
-        await configure_adaptive_logging(
+        configure_adaptive_logging(
             service_name='large-attr-test',
             lipservice_url='http://localhost:8000',
         )
@@ -370,7 +370,7 @@ class TestFrameworkIntegration:
                 mock_settings.configure.return_value = None
 
                 # Configure SDK
-                await configure_adaptive_logging(
+                configure_adaptive_logging(
                     service_name='django-test',
                     lipservice_url='http://localhost:8000',
                 )
@@ -391,7 +391,7 @@ class TestFrameworkIntegration:
             mock_fastapi.return_value = mock_app
 
             # Configure SDK
-            await configure_adaptive_logging(
+            configure_adaptive_logging(
                 service_name='fastapi-test',
                 lipservice_url='http://localhost:8000',
             )
@@ -412,7 +412,7 @@ class TestFrameworkIntegration:
             mock_flask.return_value = mock_app
 
             # Configure SDK
-            await configure_adaptive_logging(
+            configure_adaptive_logging(
                 service_name='flask-test',
                 lipservice_url='http://localhost:8000',
             )

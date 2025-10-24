@@ -25,6 +25,7 @@ dependencies = [
     # PostHog OTLP integration
     "opentelemetry-sdk>=1.33.1",
     "opentelemetry-exporter-otlp-proto-grpc>=1.33.1",
+    "opentelemetry-proto>=1.33.1",
 ]
 
 [project.optional-dependencies]
@@ -41,6 +42,10 @@ dev = [
     "aiohttp>=3.9.0",
     "black>=24.0.0",
     "flake8>=7.0.0",
+    # Framework dependencies for integration tests
+    "django>=4.2",
+    "fastapi>=0.115.6",
+    "flask>=3.0.0",
 ]
 
 [project.urls]
