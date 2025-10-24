@@ -376,25 +376,25 @@ class TestDataConsistency:
         
         computer = get_signature_computer()
         
-        # These should produce the same signature
+        # These should produce the same signature (same pattern after normalization)
         message1 = "User 123 logged in from IP 192.168.1.1"
         message2 = "User 456 logged in from IP 10.0.0.1"
         
         sig1 = computer.compute_signature(message1)
         sig2 = computer.compute_signature(message2)
         
-        # Should be different (different user IDs and IPs)
-        assert sig1 != sig2
+        # Should be the same pattern (both normalize to "User N logged in from IP IP")
+        assert sig1 == sig2
         
-        # But these should be the same pattern
+        # But these should be different patterns
         message3 = "User 789 logged in from IP 192.168.1.2"
-        message4 = "User 101112 logged in from IP 10.0.0.2"
+        message4 = "Admin 101112 logged in from IP 10.0.0.2"  # Different role
         
         sig3 = computer.compute_signature(message3)
         sig4 = computer.compute_signature(message4)
         
-        # Should be the same pattern
-        assert sig3 == sig4
+        # Should be different patterns (different roles)
+        assert sig3 != sig4
 
 
 if __name__ == "__main__":

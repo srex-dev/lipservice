@@ -151,9 +151,18 @@ class PostHogOTLPExporter:
                 asyncio.run(self.client.aclose())
         except RuntimeError:
             # No event loop, create a new one
-            asyncio.run(self.client.aclose())
+            try:
+                asyncio.run(self.client.aclose())
+            except RuntimeError:
+                # Interpreter is shutting down, skip client close
+                pass
 
-        self._executor.shutdown(wait=True)
+        # Shutdown executor gracefully
+        try:
+            self._executor.shutdown(wait=True)
+        except RuntimeError:
+            # Interpreter is shutting down, skip executor shutdown
+            pass
         logger.info("posthog_exporter_stopped")
 
     async def export_log(
@@ -202,6 +211,9 @@ class PostHogOTLPExporter:
             context: Additional log context
             **kwargs: Additional log attributes
         """
+        if not self._running:
+            return  # Skip if not running
+
         # Create OTLP log record
         log_record = self._create_log_record(message, severity, timestamp, context, **kwargs)
 
@@ -211,8 +223,12 @@ class PostHogOTLPExporter:
 
             # Flush if batch is full
             if len(self.batch) >= self.config.batch_size:
-                # Submit flush task to thread pool
-                self._executor.submit(self._flush_batch_sync)
+                # Submit flush task to thread pool (with error handling)
+                try:
+                    self._executor.submit(self._flush_batch_sync)
+                except RuntimeError:
+                    # Interpreter is shutting down, flush synchronously
+                    self._flush_batch_sync()
 
     def _create_log_record(
         self,
