@@ -1,0 +1,81 @@
+{
+  "name": "LipService Cost Optimizer",
+  "description": "AI-powered intelligent log sampling to reduce PostHog costs by 50-80% while maintaining observability",
+  "version": "1.0.0",
+  "main": "index.js",
+  "posthog": {
+    "appId": "lipservice-cost-optimizer",
+    "config": [
+      {
+        "key": "lipservice_url",
+        "name": "LipService Backend URL",
+        "type": "string",
+        "hint": "URL of your LipService backend instance",
+        "default": "https://lipservice.company.com",
+        "required": true
+      },
+      {
+        "key": "api_key",
+        "name": "LipService API Key",
+        "type": "string",
+        "hint": "API key for authenticating with LipService",
+        "required": true,
+        "secret": true
+      },
+      {
+        "key": "service_name",
+        "name": "Service Name",
+        "type": "string",
+        "hint": "Name of your service for pattern tracking",
+        "default": "posthog-service",
+        "required": true
+      },
+      {
+        "key": "enable_sampling",
+        "name": "Enable Intelligent Sampling",
+        "type": "boolean",
+        "hint": "Enable AI-powered log sampling",
+        "default": true
+      },
+      {
+        "key": "sampling_rate",
+        "name": "Default Sampling Rate",
+        "type": "number",
+        "hint": "Default sampling rate (0.1 = 10%)",
+        "default": 0.2,
+        "min": 0.01,
+        "max": 1.0
+      },
+      {
+        "key": "error_sampling_rate",
+        "name": "Error Log Sampling Rate",
+        "type": "number",
+        "hint": "Sampling rate for ERROR logs (1.0 = 100%)",
+        "default": 1.0,
+        "min": 0.1,
+        "max": 1.0
+      }
+    ]
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^5.0.0",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^5.0.0",
+    "ts-loader": "^9.0.0",
+    "css-loader": "^6.0.0",
+    "style-loader": "^3.0.0",
+    "html-webpack-plugin": "^5.0.0"
+  }
+}

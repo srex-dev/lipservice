@@ -1,8 +1,8 @@
 [project]
 name = "lipservice"
-version = "0.1.0"
+version = "0.6.0"
 description = "AI-powered intelligent log sampling that reduces costs by 50-80%"
-requires-python = ">=3.11"
+requires-python = "==3.11.*"  # Match PostHog exactly
 readme = "README.md"
 license = { text = "MIT" }
 
@@ -30,6 +30,10 @@ dependencies = [
     # ML/Analysis (matching PostHog)
     "scikit-learn==1.5.0",  # PostHog uses 1.5.0
     "numpy==1.26.4",  # PostHog uses 1.26.4
+    
+    # OpenTelemetry (matching PostHog versions - for OTLP exporters)
+    "opentelemetry-sdk==1.33.1",  # PostHog uses 1.33.1
+    "opentelemetry-exporter-otlp-proto-grpc==1.33.1",  # PostHog uses 1.33.1
     
     # Additional (not in PostHog, but needed for us)
     "alembic>=1.13.0",  # Database migrations
@@ -70,27 +74,53 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-# PostHog's selection of rules
+# PostHog's exact selection of rules (from their pyproject.toml)
 select = [
-    "B",    # flake8-bugbear
-    "C4",   # flake8-comprehensions
-    "C9",   # mccabe complexity
-    "E",    # pycodestyle errors
-    "F",    # pyflakes
-    "I",    # isort
-    "UP",   # pyupgrade
-    "W",    # pycodestyle warnings
+    "B",       # flake8-bugbear
+    "C4",      # flake8-comprehensions
+    "C9",      # mccabe complexity
+    "E",       # pycodestyle errors
+    "F",       # pyflakes
+    "I",       # isort
+    "RUF005",  # collection-literal-concatenation
+    "RUF013",  # implicit-optional
+    "RUF015",  # unnecessary-iterable-allocation-for-first-element
+    "RUF019",  # unnecessary-key-check
+    "T100",    # debugger
+    "T2",      # print-found
+    "TRY201",  # verbose-raise
+    "TRY400",  # error-instead-of-exception
+    "UP",      # pyupgrade
+    "W",       # pycodestyle warnings
 ]
 
+# PostHog's ignore list (for compatibility)
 ignore = [
-    "E501",  # line too long (handled by formatter)
+    "B017",  # assertRaises(Exception)
+    "B019",  # Use of functools.lru_cache
+    "B904",  # Use raise from
+    "B905",  # zip() without explicit strict
+    "C901",  # Complex function
+    "E501",  # Line too long (formatter handles)
+    "E722",  # Bare except
+    "E731",  # Lambda assignment
+    "F403",  # Star imports
+    "F541",  # f-string without placeholders
+    "F601",  # Dictionary key repeated
+    "UP007", # Use X | Y for Union
+    "UP032", # Use f-string
 ]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
 [tool.ruff.lint.isort]
-known-first-party = ["src"]
+# PostHog's isort configuration
+combine-as-imports = true
+force-wrap-aliases = true
+length-sort-straight = true
+split-on-trailing-comma = false
+known-first-party = ["src", "lipservice"]
 
 [tool.ruff.format]
 quote-style = "double"

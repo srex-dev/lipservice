@@ -1,0 +1,98 @@
+name: Publish Python SDK to PyPI
+
+on:
+  push:
+    tags:
+      - 'sdk-python-v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 0.2.0)'
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # This is used for the trusted publishing
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+
+    - name: Build package
+      run: |
+        cd sdk/python
+        python -m build
+
+    - name: Check package
+      run: |
+        cd sdk/python
+        twine check dist/*
+
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: sdk/python/dist/
+        print-hash: true
+        skip-existing: true
+
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+        body: |
+          ## LipService Python SDK ${{ github.ref_name }}
+          
+          ### 🎉 New Features
+          - ✅ **PostHog OTLP Integration**: One-line PostHog integration with intelligent sampling
+          - ✅ **OTLP Protocol Support**: Full OpenTelemetry Protocol compliance
+          - ✅ **Batch Export**: Efficient log batching with retry logic
+          - ✅ **Framework Support**: Django, FastAPI, Flask integrations
+          
+          ### 📦 Installation
+          ```bash
+          pip install lipservice-sdk
+          ```
+          
+          ### 🚀 Quick Start
+          ```python
+          from lipservice import configure_adaptive_logging, get_logger
+          
+          configure_adaptive_logging(
+              service_name="my-api",
+              lipservice_url="https://lipservice.company.com",
+              posthog_api_key="phc_xxx",
+              posthog_team_id="12345",
+          )
+          
+          logger = get_logger(__name__)
+          logger.info("user_login", user_id=123)  # Sampled + sent to PostHog!
+          ```
+          
+          ### 💰 Cost Savings
+          - **50-80% reduction** in PostHog log storage costs
+          - **Zero data loss** (ERROR logs always kept)
+          - **AI-powered intelligence** for sampling decisions
+          
+          ### 📚 Documentation
+          - [README](https://github.com/srex-dev/lipservice/blob/main/sdk/python/README.md)
+          - [Examples](https://github.com/srex-dev/lipservice/tree/main/sdk/python/examples)
+          - [PostHog Integration Guide](https://github.com/srex-dev/lipservice/blob/main/sdk/python/examples/posthog_integration.py)

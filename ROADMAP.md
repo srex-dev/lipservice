@@ -136,94 +136,115 @@ Build an AI-powered logging intelligence system that reduces costs by 50-80% whi
 
 ---
 
-### Sprint 6: Policy Distribution API (Weeks 11-12)
-**Theme:** Make policies accessible
+### Sprint 6: SDK Wrappers with PostHog OTLP Exporters (Weeks 11-12)
+**Theme:** Complete SDK with PostHog integration
+
+**Context:** PostHog issue #26089 shows SDK wrappers are NOT built yet (unchecked in beta checklist)
 
 **Goals:**
-- [ ] Policy CRUD endpoints
-- [ ] Redis caching layer
-- [ ] Policy history/versioning
-- [ ] Webhook support (future)
-- [ ] API documentation
+- [ ] Add PostHog OTLP exporter to Python SDK
+- [ ] OpenTelemetry protocol implementation (HTTP/gRPC)
+- [ ] JWT authentication for PostHog
+- [ ] One-line PostHog integration
+- [ ] Testing with local PostHog + PostHog Cloud
+- [ ] Performance benchmarking
+- [ ] Publish to PyPI
 
 **Deliverables:**
-- REST API for policies
-- Policy cache with TTL
-- OpenAPI/Swagger docs
+- Python SDK v0.2.0 with PostHog export
+- Complete example: `configure_adaptive_logging(posthog_api_key="phc_xxx")`
+- Tested with real PostHog instance
+- Documentation with PostHog examples
 
 **Exit Criteria:**
-- API responds in < 100ms
-- Policies cached effectively
-- Comprehensive API docs
+- SDK sends logs to PostHog via OTLP successfully
+- <1ms overhead per log decision
+- Works with PostHog Cloud and self-hosted
+- Published to PyPI
 
 ---
 
 ## Q2 2025: SDK Development (Sprints 7-9)
 
-### Sprint 7: Python SDK - Core (Weeks 13-14)
-**Theme:** First SDK implementation
+### Sprint 7: JavaScript/TypeScript SDK with PostHog OTLP (Weeks 13-14)
+**Theme:** Expand to JS/TS ecosystem
+
+**Context:** Fill PostHog's JS/Python SDK gap (beta checklist unchecked)
 
 **Goals:**
-- [ ] Package structure (`ai-logging`)
-- [ ] Local sampling logic
-- [ ] Pattern signature generation
-- [ ] Policy fetch/cache
-- [ ] Basic OTLP integration
+- [ ] TypeScript SDK package (`@lipservice/sdk`)
+- [ ] Pattern signature generation (ported from Python)
+- [ ] Policy client (async fetch)
+- [ ] Adaptive sampler
+- [ ] PostHog OTLP HTTP exporter
+- [ ] Winston/Pino logger integrations
+- [ ] Express.js/Next.js examples
+- [ ] Publish to npm
 
 **Deliverables:**
-- Working Python SDK
-- Example apps
-- Initial docs
-
-**Exit Criteria:**
-- SDK can sample logs locally
-- Fetches policies from API
-- < 5ms overhead per log
-
----
-
-### Sprint 8: Python SDK - Production Ready (Weeks 15-16)
-**Theme:** Polish and publish
-
-**Goals:**
-- [ ] Structlog integration
-- [ ] Stdlib logging integration
-- [ ] Error handling
-- [ ] PyPI packaging
-- [ ] Comprehensive docs and examples
-
-**Deliverables:**
-- Published to PyPI
-- Quick start guide
-- Example projects
-- Performance benchmarks
-
-**Exit Criteria:**
-- Published to PyPI
-- 90%+ test coverage
-- Positive alpha user feedback
-
----
-
-### Sprint 9: JavaScript SDK (Weeks 17-18)
-**Theme:** Expand to JS ecosystem
-
-**Goals:**
-- [ ] TypeScript implementation
-- [ ] Winston/Pino integration
-- [ ] Node.js and browser support
-- [ ] npm package
-- [ ] TypeScript types
-
-**Deliverables:**
-- `@ai-logging/sdk` package
-- Works in Node and browsers
-- Examples for Express, Next.js
+- `@lipservice/sdk` npm package
+- Works in Node.js and browsers
+- PostHog Cloud integration
+- TypeScript type definitions
+- Complete examples
 
 **Exit Criteria:**
 - Published to npm
-- Works in Node.js and browsers
+- Works with PostHog via OTLP
 - < 2ms overhead
+- Full TypeScript support
+
+---
+
+### Sprint 8: Production Readiness & PostHog App (Weeks 15-16)
+**Theme:** Production hardening and PostHog marketplace
+
+**Goals:**
+- [ ] PostHog App/Plugin development
+- [ ] Cost savings dashboard in PostHog UI
+- [ ] Alerting integration with PostHog
+- [ ] Performance optimization (all SDKs)
+- [ ] Security audit
+- [ ] Load testing (1M+ logs)
+- [ ] Kubernetes deployment guides
+- [ ] Prometheus metrics + Grafana dashboards
+
+**Deliverables:**
+- PostHog App published to marketplace
+- Production deployment guides
+- Security audit report
+- Load test results (handles 1M+ logs)
+- Full observability stack
+
+**Exit Criteria:**
+- PostHog App working in PostHog UI
+- Passes security audit
+- < 1ms sampling decision overhead
+- Can handle 1M logs/minute
+- 99.9% uptime capability
+
+---
+
+### Sprint 9: Additional Language SDKs (Weeks 17-18) - OPTIONAL
+**Theme:** Expand language support based on demand
+
+**Context:** Only build if PostHog users request these languages
+
+**Goals:**
+- [ ] Go SDK with PostHog OTLP exporter
+- [ ] Java/Kotlin SDK (if enterprise demand)
+- [ ] Ruby SDK (if Rails users need it)
+- [ ] Rust SDK (if systems programming demand)
+
+**Deliverables:**
+- Additional SDK packages as needed
+- Language-specific examples
+- Published to respective package managers
+
+**Exit Criteria:**
+- Each SDK works with PostHog via OTLP
+- Performance benchmarks met
+- Documentation complete
 
 ---
 

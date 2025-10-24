@@ -1,448 +1,379 @@
-# AI Logging Intelligence - TODO List
+# LipService - TODO List
 
-**Last Updated:** 2025-01-09  
-**Current Sprint:** Sprint 1 (Weeks 1-2)  
-**Status:** 🟡 In Progress
-
----
-
-## 🎯 Current Sprint: Sprint 1 - Project Setup
-
-### 📦 Project Structure & Setup
-- [ ] Initialize Git repository
-  - [ ] Create `.gitignore` file
-  - [ ] Create `README.md` with project overview
-  - [ ] Add MIT/Apache license
-  - [ ] Create initial commit
-
-- [ ] Set up Python project
-  - [ ] Create `pyproject.toml` with dependencies
-  - [ ] Set up virtual environment
-  - [ ] Install core dependencies (fastapi, uvicorn, sqlalchemy, etc.)
-  - [ ] Configure `ruff` for linting
-  - [ ] Configure `pytest` for testing
-
-- [ ] Create project directory structure
-  ```
-  ai-logging-intelligence/
-  ├── src/
-  │   ├── api/              # REST API endpoints
-  │   ├── engine/           # Core analysis engine
-  │   ├── storage/          # Database models
-  │   ├── integrations/     # External integrations
-  │   └── utils/            # Shared utilities
-  ├── tests/
-  ├── docs/
-  ├── docker/
-  └── examples/
-  ```
-
-### 🐳 Docker & Infrastructure
-- [ ] Create `Dockerfile` for API service
-- [ ] Create `docker-compose.yml` with:
-  - [ ] API service
-  - [ ] PostgreSQL database
-  - [ ] Redis cache
-  - [ ] (Optional) Jaeger for tracing
-- [ ] Create database initialization scripts
-- [ ] Test `docker-compose up` works
-
-### 🗄️ Database Schema
-- [ ] Design PostgreSQL schema
-  - [ ] `patterns` table (log patterns and signatures)
-  - [ ] `policies` table (sampling policies)
-  - [ ] `services` table (tracked services)
-  - [ ] `analysis_runs` table (analysis history)
-  - [ ] `anomalies` table (detected anomalies)
-- [ ] Create SQLAlchemy models
-- [ ] Create Alembic migrations
-- [ ] Add seed data for testing
-
-### 🚀 Basic API Service
-- [ ] Create FastAPI application
-  - [ ] Health check endpoint (`GET /health`)
-  - [ ] Ready check endpoint (`GET /ready`)
-  - [ ] Version endpoint (`GET /version`)
-- [ ] Add CORS middleware
-- [ ] Add request logging
-- [ ] Add error handling middleware
-- [ ] Create OpenAPI documentation
-
-### 🧪 Testing & CI
-- [ ] Set up pytest configuration
-- [ ] Create test fixtures (mock data)
-- [ ] Write basic API tests
-- [ ] Set up GitHub Actions
-  - [ ] Test workflow
-  - [ ] Lint workflow
-  - [ ] Docker build workflow
-- [ ] Add pre-commit hooks
-
-### 📝 Documentation
-- [ ] Write `README.md` with:
-  - [ ] Project overview
-  - [ ] Quick start guide
-  - [ ] Architecture diagram
-  - [ ] Development setup
-- [ ] Create `CONTRIBUTING.md`
-- [ ] Create `CODE_OF_CONDUCT.md`
-- [ ] Add inline code documentation
+**Last Updated:** October 9, 2025  
+**Current Sprint:** Sprint 6 - SDK Wrappers & PostHog Integration  
+**Status:** 🟢 62.5% Complete (5 of 8 sprints done)
 
 ---
 
-## 📋 Backlog: Sprint 2 - Pattern Analysis
+## ✅ Completed Sprints
 
-### Pattern Analyzer Core
-- [ ] Implement log signature generation
-  - [ ] Normalize log messages (remove variables)
-  - [ ] Hash normalized messages
-  - [ ] Handle edge cases (empty logs, special chars)
-- [ ] Implement pattern clustering
-  - [ ] TF-IDF vectorization
-  - [ ] DBSCAN clustering
-  - [ ] Cluster labeling and metadata
-- [ ] Implement frequency analysis
-  - [ ] Count patterns over time
-  - [ ] Sliding window statistics
-- [ ] Implement basic anomaly detection
-  - [ ] Rate-based anomaly detection
-  - [ ] Z-score calculation
-  - [ ] Threshold-based alerts
+### Sprint 1: Foundation ✅
+- [x] FastAPI backend service
+- [x] PostgreSQL + Redis + Docker
+- [x] SQLAlchemy models + Alembic migrations
+- [x] CI/CD with GitHub Actions
+- [x] Core API endpoints
 
-### Testing & Benchmarking
-- [ ] Create test datasets (10K, 100K, 1M logs)
-- [ ] Performance benchmarks
-- [ ] Accuracy validation
-- [ ] Unit tests for all components
+### Sprint 2: AI/ML Engine ✅
+- [x] Pattern signature generation
+- [x] ML clustering (TF-IDF + DBSCAN)
+- [x] Anomaly detection (statistical methods)
+- [x] 95% test coverage
+
+### Sprint 3: PostHog Integration ✅
+- [x] PostHog ClickHouse client
+- [x] PostHog API client
+- [x] AnalysisService end-to-end
+- [x] Integration tests
+
+### Sprint 4: LLM Integration ✅
+- [x] Multi-LLM support (OpenAI, Anthropic, Rule-based)
+- [x] PolicyGenerator with AI prompts
+- [x] Complete pipeline API
+- [x] Policy versioning
+
+### Sprint 5: Python SDK Core ✅
+- [x] SDK package structure
+- [x] Pattern detection (client-side)
+- [x] Policy client
+- [x] Adaptive sampler
+- [x] Logging handler
+- [x] Framework integrations (Django, FastAPI, Flask)
+- [x] 24 SDK tests
 
 ---
 
-## 📋 Backlog: Sprint 3 - PostHog Integration
+## 🚧 Current Sprint: Sprint 6 - SDK Wrappers & PostHog Integration
 
-### PostHog Integration
-- [ ] Create PostHog API client
-  - [ ] Authentication handling
-  - [ ] Logs query endpoint
+### 🎯 Primary Goal
+**Build complete SDK wrappers with PostHog OTLP exporters for all languages**
+
+Based on PostHog issue #26089, they don't have SDK wrappers yet. LipService will provide:
+- Intelligent sampling (our unique value)
+- PostHog OTLP transport (fills their gap)
+- Complete one-line solution
+
+---
+
+### Python SDK - PostHog Integration
+- [ ] Build OTLP exporter for PostHog
+  - [ ] HTTP/gRPC OTLP protocol implementation
+  - [ ] JWT authentication with PostHog
+  - [ ] Team ID integration
+  - [ ] Batch export with buffering
   - [ ] Error handling and retries
-- [ ] Implement ClickHouse direct queries (optional)
-- [ ] Add batch fetching with pagination
-- [ ] Add rate limiting
-- [ ] Integration tests with local PostHog
+  - [ ] Connection pooling
 
-### Example & Documentation
-- [ ] Create example notebook showing integration
-- [ ] Add PostHog setup guide
-- [ ] Document API authentication
+- [ ] Enhanced configuration
+  - [ ] `posthog_api_key` parameter
+  - [ ] `posthog_endpoint` parameter (Cloud vs self-hosted)
+  - [ ] `posthog_team_id` parameter
+  - [ ] Auto-detect PostHog environment
 
----
+- [ ] Complete integration example
+  ```python
+  from lipservice import configure_adaptive_logging
+  
+  configure_adaptive_logging(
+      service_name="my-app",
+      lipservice_url="https://lipservice.com",
+      posthog_api_key="phc_xxx",  # ← Built-in PostHog!
+  )
+  # Samples + sends to PostHog automatically
+  ```
 
-## 📋 Backlog: Sprint 4 - LLM Integration
+- [ ] PostHog-specific features
+  - [ ] Trace/span ID correlation
+  - [ ] PostHog event correlation
+  - [ ] Session replay correlation
+  - [ ] Resource attributes mapping
 
-### LLM Provider Abstraction
-- [ ] Create `LLMProvider` abstract base class
-- [ ] Implement OpenAI provider
-  - [ ] Chat completions API
-  - [ ] Streaming support
-  - [ ] Error handling
-- [ ] Implement Ollama provider (local)
-- [ ] Implement prompt template system
-- [ ] Add response validation
-- [ ] Add fallback mechanisms
-
-### Configuration & Testing
-- [ ] Environment variable configuration
-- [ ] Provider selection logic
-- [ ] Mock LLM for testing
-- [ ] Cost tracking for API calls
-
----
-
-## 📋 Backlog: Sprint 5 - Policy Generation
-
-### Policy Generation Engine
-- [ ] Design prompt templates
-  - [ ] Policy generation prompt
-  - [ ] Cost optimization prompt
-  - [ ] Anomaly explanation prompt
-- [ ] Implement context builder
-  - [ ] Pattern summary
-  - [ ] Volume statistics
-  - [ ] Cost calculations
-- [ ] Implement policy generator
-  - [ ] LLM call with retry logic
-  - [ ] Response parsing
-  - [ ] Policy validation
-- [ ] Add policy safety checks
-  - [ ] Ensure errors always sampled
-  - [ ] Validate rate ranges (0-1)
-  - [ ] Check required fields
-
-### Cost Estimation
-- [ ] Create cost model (GB → $)
-- [ ] Implement volume calculator
-- [ ] Project cost savings
-- [ ] Add cost comparison reporting
+- [ ] Testing with PostHog
+  - [ ] Test with local PostHog instance
+  - [ ] Test with PostHog Cloud
+  - [ ] Validate OTLP format compliance
+  - [ ] Performance benchmarking
 
 ---
 
-## 📋 Backlog: Sprint 6 - Policy Distribution
+### JavaScript/TypeScript SDK - PostHog Integration
+- [ ] Create TypeScript SDK package (`@lipservice/sdk`)
+  - [ ] Pattern signature generation (port from Python)
+  - [ ] Policy client (async HTTP)
+  - [ ] Adaptive sampler (TypeScript)
+  - [ ] PostHog OTLP exporter
 
-### Policy API
-- [ ] Create policy CRUD endpoints
-  - [ ] `GET /api/v1/policies/{service}`
-  - [ ] `POST /api/v1/policies/{service}`
-  - [ ] `GET /api/v1/policies/{service}/history`
-  - [ ] `DELETE /api/v1/policies/{service}`
-- [ ] Add Redis caching layer
-- [ ] Implement policy versioning
-- [ ] Add policy comparison endpoint
-- [ ] Create webhook system (for future)
+- [ ] Node.js integrations
+  - [ ] Winston logger integration
+  - [ ] Pino logger integration
+  - [ ] Bunyan logger integration
+  - [ ] Console.log wrapper
 
-### Pattern Stats Endpoint
-- [ ] `POST /api/v1/patterns/stats` endpoint
-- [ ] Store stats in database
-- [ ] Trigger analysis on stats received
-- [ ] Add rate limiting
+- [ ] Framework integrations
+  - [ ] Express.js middleware
+  - [ ] Next.js integration
+  - [ ] NestJS module
+  - [ ] Fastify plugin
 
----
-
-## 📋 Backlog: Sprint 7-8 - Python SDK
-
-### SDK Core
-- [ ] Create package structure
-- [ ] Implement `AdaptiveLoggingHandler`
-- [ ] Add local sampling logic
-- [ ] Add pattern signature generation
-- [ ] Implement policy fetch/cache
-- [ ] Add OTLP integration
-
-### Integrations
-- [ ] Structlog integration
-- [ ] Stdlib logging integration
-- [ ] Add configuration system
-- [ ] Error handling
-
-### Publishing
-- [ ] PyPI packaging
-- [ ] Version management
-- [ ] Release automation
-- [ ] Comprehensive docs
-
----
-
-## 📋 Backlog: Sprint 9 - JavaScript SDK
-
-### SDK Core
-- [ ] Create TypeScript project
-- [ ] Implement adaptive handler
-- [ ] Add local sampling
-- [ ] Policy fetch/cache
-- [ ] OTLP integration
-
-### Platform Support
-- [ ] Node.js support
 - [ ] Browser support
+  - [ ] Browser console capture
+  - [ ] Window.onerror integration
+  - [ ] Bundle size optimization (<10KB)
+
+- [ ] PostHog integration
+  - [ ] OTLP HTTP exporter
+  - [ ] PostHog Cloud endpoint support
+  - [ ] Session replay correlation
+  - [ ] PostHog identify() integration
+
+- [ ] Package & publish
+  - [ ] npm package configuration
+  - [ ] TypeScript definitions
+  - [ ] Examples and docs
+  - [ ] Publish to npm
+
+---
+
+### Go SDK - PostHog Integration
+- [ ] Create Go SDK package (`github.com/yourorg/lipservice-go`)
+  - [ ] Pattern signature (Go implementation)
+  - [ ] Policy client (net/http)
+  - [ ] Adaptive sampler (goroutines)
+  - [ ] PostHog OTLP exporter
+
+- [ ] Standard library integration
+  - [ ] log package wrapper
+  - [ ] slog integration (Go 1.21+)
+  - [ ] Structured logging support
+
+- [ ] Framework integrations
+  - [ ] Gin middleware
+  - [ ] Echo middleware
+  - [ ] Fiber middleware
+  - [ ] Chi middleware
+
+- [ ] PostHog integration
+  - [ ] OTLP gRPC exporter (Go native)
+  - [ ] Context propagation
+  - [ ] Trace correlation
+
+- [ ] Package & publish
+  - [ ] Go module setup
+  - [ ] Examples and docs
+  - [ ] GitHub releases
+
+---
+
+### Java/Kotlin SDK - PostHog Integration (Optional)
+- [ ] Create Java SDK (`io.lipservice:sdk`)
+  - [ ] Pattern signature (Java)
+  - [ ] Policy client (HttpClient)
+  - [ ] Adaptive sampler (thread-safe)
+  - [ ] PostHog OTLP exporter
+
+- [ ] Framework integrations
+  - [ ] Spring Boot starter
+  - [ ] Logback appender
+  - [ ] Log4j2 appender
+  - [ ] SLF4J integration
+
+- [ ] PostHog integration
+  - [ ] OTLP gRPC exporter
+  - [ ] MDC context support
+
+- [ ] Package & publish
+  - [ ] Maven Central
+  - [ ] Gradle plugin
+
+---
+
+### Ruby SDK - PostHog Integration (Optional)
+- [ ] Create Ruby gem (`lipservice-sdk`)
+  - [ ] Pattern signature
+  - [ ] Policy client
+  - [ ] Adaptive sampler
+  - [ ] PostHog OTLP exporter
+
+- [ ] Framework integrations
+  - [ ] Rails integration
+  - [ ] Rack middleware
+  - [ ] Sidekiq integration
+
+- [ ] Publish to RubyGems
+
+---
+
+## 📋 Sprint 6 Detailed Tasks
+
+### Week 1: Python SDK - PostHog Exporter
+- [ ] Research OTLP protocol (HTTP vs gRPC)
+- [ ] Implement basic OTLP HTTP exporter
+- [ ] Add PostHog authentication (JWT)
+- [ ] Implement log batching and buffering
+- [ ] Add retry logic and error handling
+- [ ] Write tests for exporter
+- [ ] Create example: Django + PostHog
+- [ ] Create example: FastAPI + PostHog
+- [ ] Update SDK documentation
+
+### Week 2: Python SDK - Testing & Polish
+- [ ] Test with local PostHog instance
+- [ ] Test with PostHog Cloud
+- [ ] Performance benchmarking
+- [ ] Memory profiling
+- [ ] Fix any bugs found
+- [ ] Update README with PostHog examples
+- [ ] Publish v0.2.0 to PyPI (with PostHog support)
+
+---
+
+## 📋 Sprint 7: JavaScript/TypeScript SDK
+
+### Week 1: Core SDK
+- [ ] Set up TypeScript project
+- [ ] Port signature generation to TypeScript
+- [ ] Implement policy client (fetch API)
+- [ ] Implement adaptive sampler
+- [ ] Write unit tests
+
+### Week 2: PostHog Integration
+- [ ] Build OTLP HTTP exporter (TypeScript)
+- [ ] Add PostHog authentication
 - [ ] Winston integration
 - [ ] Pino integration
-
-### Publishing
-- [ ] npm package
-- [ ] Type definitions
-- [ ] Examples (Express, Next.js)
-- [ ] Documentation
+- [ ] Express.js example
+- [ ] Next.js example
+- [ ] Publish to npm
 
 ---
 
-## 📋 Backlog: Sprint 10-12 - Advanced Features
+## 📋 Sprint 8: Production Readiness
 
-### Cost Optimization
-- [ ] Cost model refinement
-- [ ] Volume trend analysis
-- [ ] Cost projection dashboard
-- [ ] Optimization recommendations
-
-### Anomaly Detection & Explanation
-- [ ] Enhanced anomaly detection
-- [ ] LLM-based explanations
-- [ ] Context gathering
-- [ ] Debugging suggestions
-
-### Production Hardening
-- [ ] Prometheus metrics
-- [ ] Grafana dashboards
-- [ ] Performance optimization
+### All SDKs
+- [ ] Performance benchmarks (all languages)
 - [ ] Security audit
 - [ ] Load testing
+- [ ] Documentation polish
+- [ ] Production deployment guides
+
+### PostHog-Specific
+- [ ] PostHog App/Plugin development
+- [ ] Cost savings dashboard for PostHog UI
+- [ ] Integration with PostHog alerting
+- [ ] PostHog marketplace listing
 
 ---
 
-## 🔧 Technical Debt & Nice-to-Haves
-
-### Code Quality
-- [ ] Increase test coverage to 90%+
-- [ ] Add type hints everywhere
-- [ ] Improve error messages
-- [ ] Add more logging
-- [ ] Refactor complex functions
-
-### Performance
-- [ ] Profile and optimize hot paths
-- [ ] Add connection pooling
-- [ ] Implement better caching
-- [ ] Optimize database queries
-
-### Developer Experience
-- [ ] Add dev container support
-- [ ] Create Makefile with common commands
-- [ ] Add example projects
-- [ ] Video tutorials
-
-### Documentation
-- [ ] API reference docs
-- [ ] Architecture decision records
-- [ ] Troubleshooting guide
-- [ ] FAQ section
-
----
-
-## 🐛 Known Issues & Bugs
-
-### Critical
-- (None yet)
+## 🎯 Priority Features (Based on PostHog #26089)
 
 ### High Priority
-- (None yet)
+- [ ] **PostHog OTLP Exporters** - Fill their SDK gap
+- [ ] **Error Tracking Enhancement** - AI-powered error clustering
+- [ ] **Alerting Integration** - Webhooks for anomalies
+- [ ] **Cost Dashboard** - Show savings in PostHog UI
 
 ### Medium Priority
-- (None yet)
+- [ ] **Additional language SDKs** - Go, Java, Ruby
+- [ ] **Browser support** - Client-side logging
+- [ ] **Performance optimization** - <1ms sampling decisions
+- [ ] **Multi-region support** - Edge deployment
 
-### Low Priority
-- (None yet)
-
----
-
-## 💡 Ideas & Future Enhancements
-
-### Short-term (Next 3 months)
-- [ ] Add support for Grafana Loki
-- [ ] Create PostHog App/Plugin
-- [ ] Add Slack integration for alerts
-- [ ] Multi-tenant support
-
-### Medium-term (3-6 months)
-- [ ] Additional language SDKs (Go, Rust)
-- [ ] Machine learning models for better detection
-- [ ] Root cause analysis features
-- [ ] Log-to-trace correlation
-
-### Long-term (6-12 months)
-- [ ] Custom model fine-tuning
-- [ ] Multi-region deployment
-- [ ] Enterprise features (SSO, RBAC)
-- [ ] Community marketplace for policies
+### Low Priority (Post-Launch)
+- [ ] **Custom ML models** - Train on user data
+- [ ] **Root cause analysis** - AI-powered debugging
+- [ ] **Log-to-trace correlation** - Full observability
+- [ ] **Community marketplace** - Share policies
 
 ---
 
 ## 📊 Progress Tracking
 
-### Sprint 1 Progress
-**Target:** Week 1-2  
-**Completed:** 0/25 tasks (0%)  
-**Status:** 🟡 Just Started
-
 ### Overall Progress
-**Total Tasks:** 150+  
-**Completed:** 0  
-**In Progress:** 5  
-**Blocked:** 0  
+- **Completed:** 5 sprints (62.5%)
+- **In Progress:** Sprint 6
+- **Remaining:** 2-3 sprints
+- **Estimated Completion:** 4-6 weeks
+
+### Sprint 6 Progress
+- **Status:** 🟡 Just started
+- **Completed:** 0/20 tasks
+- **Target Date:** October 23, 2025
 
 ---
 
-## 🎉 Completed (Archive)
+## 🚀 Quick Wins (Do Next)
 
-### Week of 2025-01-09
-- [x] Created project planning documents
-- [x] Set up ITERATION_SPEC.md
-- [x] Set up ROADMAP.md
-- [x] Set up TODO.md
-- [x] Pulled fresh PostHog codebase
+### This Week
+- [ ] Add PostHog OTLP exporter to Python SDK
+- [ ] Test with local PostHog
+- [ ] Update GitHub issue with results
+- [ ] Create demo video
 
----
-
-## 📝 Notes & Decisions
-
-### Sprint 1 Notes
-- Started with Python/FastAPI for faster iteration
-- Using PostgreSQL + Redis for storage
-- Docker Compose for local development
-- GitHub Actions for CI/CD
-
-### Architecture Decisions
-- Separate service vs PostHog fork → Separate service
-- Python vs Rust → Python (FastAPI) initially
-- OpenAI vs Ollama → Support both
-- Real-time vs batch → Batch with near-real-time option
+### Next Week
+- [ ] Publish Python SDK v0.2.0 to PyPI
+- [ ] Start TypeScript SDK
+- [ ] Get beta testers
 
 ---
 
-## 🚨 Blockers & Help Needed
+## 🎯 PostHog-Specific Todos
+
+### Integration Tasks
+- [ ] Build OTLP exporters (all SDKs)
+- [ ] Test with PostHog Cloud
+- [ ] Test with self-hosted PostHog
+- [ ] Document PostHog setup
+- [ ] Create PostHog examples
+
+### Collaboration Tasks
+- [ ] Monitor GitHub issue #26089
+- [ ] Respond to PostHog team feedback
+- [ ] Test with their dogfooding logs
+- [ ] Align on integration approach
+- [ ] Contribute to PostHog docs
+
+### Marketing/Outreach
+- [ ] Update GitHub issue with test results
+- [ ] Record demo video
+- [ ] Write blog post
+- [ ] Find PostHog Slack/Discord
+- [ ] Share with PostHog community
+
+---
+
+## 📝 Notes
+
+### Decision: Build PostHog Exporters
+**Date:** October 9, 2025  
+**Reason:** PostHog doesn't have SDK wrappers yet (beta checklist unchecked)  
+**Impact:** LipService becomes complete solution, fills their gap  
+**Status:** Added to Sprint 6
+
+### SDK Language Priority
+1. ✅ Python (done in Sprint 5, add PostHog exporter in Sprint 6)
+2. TypeScript/JavaScript (Sprint 7)
+3. Go (Sprint 8, if demand)
+4. Java/Ruby (only if PostHog users request)
+
+---
+
+## 🔥 Blockers & Risks
 
 ### Current Blockers
-- (None yet)
+- None! All clear to proceed.
 
-### Help Needed
-- (None yet)
+### Potential Risks
+- **PostHog SDK release:** They might release official SDKs (we can layer on top or deprecate)
+- **OTLP spec changes:** Protocol updates could require changes
+- **Performance:** Need to validate <1ms overhead at scale
 
-### Questions
-- (None yet)
-
----
-
-## 🔄 Review Schedule
-
-- **Daily:** Update task statuses
-- **End of Sprint:** Archive completed tasks
-- **Start of Sprint:** Add new tasks from roadmap
-- **Monthly:** Review and adjust priorities
+### Mitigation
+- Monitor PostHog roadmap closely
+- Keep exporters modular (easy to swap)
+- Build on OpenTelemetry standards (stable)
 
 ---
 
-## 📞 Quick Commands
-
-### Start Development
-```bash
-# Start all services
-docker-compose up -d
-
-# Install dependencies
-pip install -e .
-
-# Run tests
-pytest
-
-# Run linter
-ruff check . --fix
-
-# Run service
-uvicorn src.main:app --reload
-```
-
-### Common Tasks
-```bash
-# Create migration
-alembic revision --autogenerate -m "description"
-
-# Run migration
-alembic upgrade head
-
-# Format code
-ruff format .
-
-# Type check
-mypy src/
-```
-
----
-
-**Remember:** This is a marathon, not a sprint. Take it one task at a time, celebrate small wins, and adjust as you learn! 🚀
-
+**Updated:** October 9, 2025  
+**Next Review:** October 16, 2025 (Sprint 6 checkpoint)
