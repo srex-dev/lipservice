@@ -122,7 +122,7 @@ class TestSDKIntegration:
         # Create multiple concurrent logging tasks
         async def log_worker(worker_id: int, count: int):
             for i in range(count):
-                await logger.info(f'Worker {worker_id} message {i}', {'worker': worker_id, 'message': i})
+                await logger.info(f'Worker {worker_id} message {i}', worker=worker_id, message=i)
                 await asyncio.sleep(0.001)  # Small delay
 
         # Run concurrent workers
@@ -153,7 +153,7 @@ class TestSDKIntegration:
         logger = get_logger('shutdown-test')
 
         # Log some messages
-        await logger.info('Before shutdown', {'test': 'value'})
+        await logger.info('Before shutdown', test='value')
 
         # Shutdown SDK
         await shutdown()
@@ -187,7 +187,7 @@ class TestPerformanceIntegration:
 
         # Log 1000 messages
         for i in range(1000):
-            await logger.info(f'Performance test message {i}', {'iteration': i})
+            await logger.info(f'Performance test message {i}', iteration=i)
 
         end_time = time.time()
         duration = end_time - start_time
@@ -222,7 +222,7 @@ class TestPerformanceIntegration:
 
         # Log many messages
         for i in range(1000):
-            await logger.info(f'Memory test message {i}', {'iteration': i})
+            await logger.info(f'Memory test message {i}', iteration=i)
 
         # Check memory usage
         current_memory = process.memory_info().rss
@@ -250,14 +250,14 @@ class TestEdgeCases:
         logger = get_logger('edge-test')
 
         # Test empty message
-        await logger.info('', {})
+        await logger.info('', special=True)
 
         # Test None message
-        await logger.info(None, {})
+        await logger.info(None, special=True)
 
         # Test very long message
         long_message = 'x' * 10000
-        await logger.info(long_message, {})
+        await logger.info(long_message, long=True)
 
         # Cleanup
         await shutdown()
@@ -285,7 +285,7 @@ class TestEdgeCases:
         ]
 
         for message in special_messages:
-            await logger.info(message, {'special': True})
+            await logger.info(message, special=True)
 
         # Cleanup
         await shutdown()
@@ -303,7 +303,7 @@ class TestEdgeCases:
 
         # Test large attributes
         large_attrs = {f'key_{i}': f'value_{i}' for i in range(1000)}
-        await logger.info('Large attributes test', large_attrs)
+        await logger.info('Large attributes test', **large_attrs)
 
         # Test nested attributes
         nested_attrs = {
@@ -315,7 +315,7 @@ class TestEdgeCases:
                 }
             }
         }
-        await logger.info('Nested attributes test', nested_attrs)
+        await logger.info('Nested attributes test', **nested_attrs)
 
         # Cleanup
         await shutdown()
@@ -327,23 +327,23 @@ class TestFrameworkIntegration:
     @pytest.mark.asyncio
     async def test_django_integration(self, mock_lipservice_backend):
         """Test Django framework integration"""
+        # Skip Django test if Django is not installed
+        try:
+            import django
+        except ImportError:
+            pytest.skip("Django not installed")
 
-        # Mock Django settings
-        with patch.dict('os.environ', {'DJANGO_SETTINGS_MODULE': 'test_settings'}):
-            with patch('django.conf.settings') as mock_settings:
-                mock_settings.configure.return_value = None
+        # Configure SDK
+        configure_adaptive_logging(
+            service_name='django-test',
+            lipservice_url='http://localhost:8000',
+        )
 
-                # Configure SDK
-                configure_adaptive_logging(
-                    service_name='django-test',
-                    lipservice_url='http://localhost:8000',
-                )
+        logger = get_logger('django-test')
+        await logger.info('Django integration test', framework='django')
 
-                logger = get_logger('django-test')
-                await logger.info('Django integration test', {'framework': 'django'})
-
-                # Cleanup
-                await shutdown()
+        # Cleanup
+        await shutdown()
 
     @pytest.mark.asyncio
     async def test_fastapi_integration(self, mock_lipservice_backend):
@@ -361,7 +361,7 @@ class TestFrameworkIntegration:
             )
 
             logger = get_logger('fastapi-test')
-            await logger.info('FastAPI integration test', {'framework': 'fastapi'})
+            await logger.info('FastAPI integration test', framework='fastapi')
 
             # Cleanup
             await shutdown()
@@ -382,7 +382,7 @@ class TestFrameworkIntegration:
             )
 
             logger = get_logger('flask-test')
-            await logger.info('Flask integration test', {'framework': 'flask'})
+            await logger.info('Flask integration test', framework='flask')
 
             # Cleanup
             await shutdown()

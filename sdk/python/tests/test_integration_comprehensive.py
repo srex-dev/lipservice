@@ -51,7 +51,14 @@ class TestEndToEndIntegration:
         ]
 
         for severity, message, attributes in test_scenarios:
-            logger.log(severity, message, **attributes)
+            if severity == "INFO":
+                logger.info(message, **attributes)
+            elif severity == "WARNING":
+                logger.warning(message, **attributes)
+            elif severity == "ERROR":
+                logger.error(message, **attributes)
+            elif severity == "DEBUG":
+                logger.debug(message, **attributes)
 
         # Wait for background processing
         await asyncio.sleep(0.5)

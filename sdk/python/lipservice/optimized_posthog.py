@@ -45,7 +45,7 @@ class ConnectionPool:
         self.headers = headers
         self.timeout = timeout
         self._client: Optional[httpx.AsyncClient] = None
-        self._lock = threading.Lock()
+        self._lock = asyncio.Lock()
     
     async def get_client(self) -> httpx.AsyncClient:
         """Get or create HTTP client."""

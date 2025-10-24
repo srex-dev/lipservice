@@ -210,26 +210,47 @@ class OptimizedSignatureComputer:
     
     def _compute_signature_optimized(self, message: str) -> str:
         """Optimized signature computation."""
-        # Normalize the message
-        normalized = message.lower().strip()
+        import re
+        import hashlib
         
-        # Apply pre-compiled patterns
-        for pattern_name, pattern in self._compiled_patterns.items():
-            if pattern_name == 'numbers':
-                normalized = pattern.sub('N', normalized)
-            elif pattern_name == 'uuids':
-                normalized = pattern.sub('UUID', normalized)
-            elif pattern_name == 'timestamps':
-                normalized = pattern.sub('TIMESTAMP', normalized)
-            elif pattern_name == 'ips':
-                normalized = pattern.sub('IP', normalized)
-            elif pattern_name == 'emails':
-                normalized = pattern.sub('EMAIL', normalized)
-            elif pattern_name == 'urls':
-                normalized = pattern.sub('URL', normalized)
-        
-        # Compute hash
-        return hashlib.md5(normalized.encode('utf-8')).hexdigest()
+        # Normalize the message (same as original function)
+        normalized = message
+
+        # Replace UUIDs first (before numbers)
+        normalized = re.sub(r"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}", "UUID", normalized, flags=re.IGNORECASE)
+
+        # Replace hex IDs
+        normalized = re.sub(r"\b[a-f0-9]{32,}\b", "HEXID", normalized, flags=re.IGNORECASE)
+
+        # Replace ISO timestamps
+        normalized = re.sub(r"\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}", "TIMESTAMP", normalized)
+
+        # Replace dates
+        normalized = re.sub(r"\b\d{4}-\d{2}-\d{2}\b", "DATE", normalized)
+
+        # Replace times
+        normalized = re.sub(r"\b\d{2}:\d{2}:\d{2}\b", "TIME", normalized)
+
+        # Replace IP addresses
+        normalized = re.sub(r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b", "IP", normalized)
+
+        # Replace email addresses
+        normalized = re.sub(r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b", "EMAIL", normalized)
+
+        # Replace URLs
+        normalized = re.sub(r"https?://[^\s]+", "URL", normalized)
+
+        # Replace numbers with placeholder (after other patterns)
+        normalized = re.sub(r"\b\d+\b", "N", normalized)
+
+        # Collapse multiple spaces
+        normalized = re.sub(r"\s+", " ", normalized)
+
+        # Trim
+        normalized = normalized.strip()
+
+        # Generate MD5 hash
+        return hashlib.md5(normalized.encode()).hexdigest()
     
     def get_stats(self) -> Dict[str, Any]:
         """Get signature computation statistics."""

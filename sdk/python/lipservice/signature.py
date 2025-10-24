@@ -32,10 +32,7 @@ def compute_signature(message: str) -> str:
     # Normalize the message
     normalized = message
 
-    # Replace numbers with placeholder
-    normalized = re.sub(r"\b\d+\b", "N", normalized)
-
-    # Replace UUIDs
+    # Replace UUIDs first (before numbers)
     normalized = re.sub(r"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}", "UUID", normalized, flags=re.IGNORECASE)
 
     # Replace hex IDs
@@ -58,6 +55,9 @@ def compute_signature(message: str) -> str:
 
     # Replace URLs
     normalized = re.sub(r"https?://[^\s]+", "URL", normalized)
+
+    # Replace numbers with placeholder (after other patterns)
+    normalized = re.sub(r"\b\d+\b", "N", normalized)
 
     # Collapse multiple spaces
     normalized = re.sub(r"\s+", " ", normalized)
