@@ -7,6 +7,8 @@ using the OpenTelemetry Protocol (OTLP).
 
 import asyncio
 import logging
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from typing import Any
 
@@ -72,6 +74,7 @@ class PostHogOTLPExporter:
     PostHog OTLP exporter for logs.
 
     Handles batching, retries, and OTLP protocol compliance.
+    Works in both sync and async contexts.
     """
 
     def __init__(self, config: PostHogConfig):
@@ -90,6 +93,8 @@ class PostHogOTLPExporter:
         self.batch: list[LogRecord] = []
         self._running = False
         self._flush_task: asyncio.Task | None = None
+        self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="posthog-exporter")
+        self._lock = threading.Lock()
 
     async def start(self) -> None:
         """Start the exporter background tasks."""
@@ -120,6 +125,35 @@ class PostHogOTLPExporter:
             await self._flush_batch()
 
         await self.client.aclose()
+        self._executor.shutdown(wait=True)
+        logger.info("posthog_exporter_stopped")
+
+    def stop_sync(self) -> None:
+        """Stop the exporter synchronously."""
+        if not self._running:
+            return
+
+        self._running = False
+
+        # Flush remaining logs synchronously
+        if self.batch:
+            self._flush_batch_sync()
+
+        # Close client synchronously
+        try:
+            import asyncio
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # Schedule the close operation
+                loop.create_task(self.client.aclose())
+            else:
+                # Run in a new event loop
+                asyncio.run(self.client.aclose())
+        except RuntimeError:
+            # No event loop, create a new one
+            asyncio.run(self.client.aclose())
+
+        self._executor.shutdown(wait=True)
         logger.info("posthog_exporter_stopped")
 
     async def export_log(
@@ -149,6 +183,36 @@ class PostHogOTLPExporter:
         # Flush if batch is full
         if len(self.batch) >= self.config.batch_size:
             await self._flush_batch()
+
+    def export_log_sync(
+        self,
+        message: str,
+        severity: str,
+        timestamp: datetime,
+        context: LogContext | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Export a single log to PostHog synchronously.
+
+        Args:
+            message: Log message
+            severity: Log severity level
+            timestamp: Log timestamp
+            context: Additional log context
+            **kwargs: Additional log attributes
+        """
+        # Create OTLP log record
+        log_record = self._create_log_record(message, severity, timestamp, context, **kwargs)
+
+        # Add to batch (thread-safe)
+        with self._lock:
+            self.batch.append(log_record)
+
+            # Flush if batch is full
+            if len(self.batch) >= self.config.batch_size:
+                # Submit flush task to thread pool
+                self._executor.submit(self._flush_batch_sync)
 
     def _create_log_record(
         self,
@@ -299,6 +363,83 @@ class PostHogOTLPExporter:
         # Clear batch
         self.batch.clear()
 
+    def _flush_batch_sync(self) -> None:
+        """Flush the current batch to PostHog synchronously."""
+        with self._lock:
+            if not self.batch:
+                return
+            
+            # Create a copy of the batch and clear it
+            batch_to_send = self.batch.copy()
+            self.batch.clear()
+
+        # Create OTLP request
+        request = self._create_otlp_request_sync(batch_to_send)
+
+        # Send with retries using sync httpx client
+        sync_client = httpx.Client(
+            base_url=self.config.endpoint,
+            headers=self.config.get_headers(),
+            timeout=self.config.timeout,
+        )
+
+        try:
+            for attempt in range(self.config.max_retries + 1):
+                try:
+                    response = sync_client.post(
+                        self.config.otlp_endpoint,
+                        content=request.SerializeToString(),
+                    )
+                    response.raise_for_status()
+
+                    logger.info(
+                        "logs_exported_sync",
+                        count=len(batch_to_send),
+                        attempt=attempt + 1,
+                    )
+                    break
+
+                except httpx.HTTPStatusError as e:
+                    if e.response.status_code in [429, 502, 503, 504]:
+                        # Retryable error
+                        if attempt < self.config.max_retries:
+                            wait_time = 2**attempt  # Exponential backoff
+                            logger.warning(
+                                "export_retry_sync",
+                                status=e.response.status_code,
+                                attempt=attempt + 1,
+                                wait_time=wait_time,
+                            )
+                            import time
+                            time.sleep(wait_time)
+                            continue
+                        else:
+                            logger.error(
+                                "export_failed_max_retries_sync",
+                                status=e.response.status_code,
+                                count=len(batch_to_send),
+                            )
+                            break
+                    else:
+                        # Non-retryable error
+                        logger.error(
+                            "export_failed_non_retryable_sync",
+                            status=e.response.status_code,
+                            count=len(batch_to_send),
+                        )
+                        break
+
+                except Exception as e:
+                    logger.error("export_error_sync", error=str(e), attempt=attempt + 1)
+                    if attempt < self.config.max_retries:
+                        import time
+                        time.sleep(2**attempt)
+                    else:
+                        break
+
+        finally:
+            sync_client.close()
+
     def _create_otlp_request(self) -> ExportLogsServiceRequest:
         """Create OTLP ExportLogsServiceRequest."""
         # Create resource
@@ -332,6 +473,39 @@ class PostHogOTLPExporter:
 
         return ExportLogsServiceRequest(resource_logs=[resource_logs])
 
+    def _create_otlp_request_sync(self, batch: list[LogRecord]) -> ExportLogsServiceRequest:
+        """Create OTLP ExportLogsServiceRequest synchronously."""
+        # Create resource
+        resource = Resource(
+            attributes=[
+                KeyValue(
+                    key="service.name",
+                    value=AnyValue(string_value="lipservice-sdk"),
+                ),
+                KeyValue(
+                    key="service.version",
+                    value=AnyValue(string_value="0.2.0"),
+                ),
+            ]
+        )
+
+        # Create scope
+        scope_logs = ScopeLogs(
+            scope=InstrumentationScope(
+                name="lipservice",
+                version="0.2.0",
+            ),
+            log_records=batch,
+        )
+
+        # Create resource logs
+        resource_logs = ResourceLogs(
+            resource=resource,
+            scope_logs=[scope_logs],
+        )
+
+        return ExportLogsServiceRequest(resource_logs=[resource_logs])
+
 
 class PostHogHandler(logging.Handler):
     """
@@ -355,7 +529,6 @@ class PostHogHandler(logging.Handler):
         super().__init__(level)
         self.config = config
         self.exporter = PostHogOTLPExporter(config)
-        self._started = False
 
     def emit(self, record: logging.LogRecord) -> None:
         """
@@ -365,11 +538,6 @@ class PostHogHandler(logging.Handler):
             record: LogRecord to emit
         """
         try:
-            # Start exporter if not started
-            if not self._started:
-                asyncio.create_task(self.exporter.start())
-                self._started = True
-
             # Extract message
             message = self.format(record) if not record.getMessage() else record.getMessage()
 
@@ -399,28 +567,27 @@ class PostHogHandler(logging.Handler):
                 "line_number": record.lineno,
             })
 
-            # Export to PostHog
-            asyncio.create_task(
-                self.exporter.export_log(
-                    message=message,
-                    severity=severity,
-                    timestamp=timestamp,
-                    context=context,
-                    **attributes,
-                )
+            # Export to PostHog using sync method to avoid event loop issues
+            self.exporter.export_log_sync(
+                message=message,
+                severity=severity,
+                timestamp=timestamp,
+                context=context,
+                **attributes,
             )
 
         except Exception as e:
-            self.handleError(record)
-            logger.error("posthog_handler_error", error=str(e))
+            # Avoid infinite recursion by not logging errors through the same handler
+            # Just call the base class error handler
+            super().handleError(record)
 
     def close(self) -> None:
         """Close handler and flush remaining logs."""
         try:
-            if self._started:
-                asyncio.run(self.exporter.stop())
+            self.exporter.stop_sync()
         except Exception as e:
-            logger.error("posthog_handler_close_error", error=str(e))
+            # Avoid logging errors through the same handler
+            pass
 
         super().close()
 

@@ -19,6 +19,7 @@ def mock_lipservice_backend():
         'max_logs_per_minute': 100
     })
     backend.reportPattern = AsyncMock(return_value={'status': 'success'})
+    backend.reportPatterns = AsyncMock(return_value={'status': 'success'})
     backend.getPatterns = AsyncMock(return_value={
         'patterns': [
             {'pattern': 'error', 'count': 10},
@@ -55,6 +56,17 @@ def mock_environment():
         'POSTHOG_TEAM_ID': '12345'
     }):
         yield
+
+
+@pytest.fixture
+def mock_posthog_backend():
+    """Mock PostHog backend for testing."""
+    backend = MagicMock()
+    backend.start = AsyncMock(return_value=None)
+    backend.stop = AsyncMock(return_value=None)
+    backend.export_log = AsyncMock(return_value=None)
+    backend.export_log_sync = MagicMock(return_value=None)
+    return backend
 
 
 @pytest.fixture
